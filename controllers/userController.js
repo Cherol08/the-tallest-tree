@@ -1,12 +1,11 @@
 const userDB = require('../models/User');
 const nodemailer = require("nodemailer");
 const dotenv = require('dotenv');
-const { count } = require('../models/User');
 dotenv.config();
 
 const getUsers = async (req, res) => {
   try {
-    const submissions = await userDB.find();
+    const submissions = await userDB.find({},{username:1, height: 1, _id:0});
     res.status(200).json(submissions);
   } catch (error) {
     res.status(400).json({error : error.message})
@@ -33,8 +32,9 @@ const createUser = async (req, res) => {
             "email": email 
         })
         
+        // find sumitted heights by email, return username + height
         const foundSubmissions = await userDB.find({email:email},{username:1, height: 1, _id:0});
-        let total = (await userDB.countDocuments( { email: email } )).toString();
+        let avg = await userDB.aggregate([{$group:{_id:req.body.email, average:{$avg:"$height"}}}]);
 
         contactEmail.verify((error) => {
           if (error) {
@@ -49,9 +49,9 @@ const createUser = async (req, res) => {
             to: email,
             subject: "Height Submission",
             html: `Hello, ${username}.</p>
-                    <p>Your latest height submission ${height} cm was added sent to The Tallest Tree's.</p>
+                    <p>Your latest height submission (${height}cm) was added submitted to The Tallest Tree Website.</p>
                     <p> Previously logged heights:\n${foundSubmissions.toString()}\n</p>
-                    <p> Average of logged heights:\n ${height/Math.round(Number(total),2)}</p>`,
+                    <p> Average of logged heights:\n ${JSON.stringify(avg)}</p>`,
           };
           contactEmail.sendMail(mail, (error) => {
             if (error) {
