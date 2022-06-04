@@ -4,7 +4,14 @@ const dotenv = require('dotenv');
 const { count } = require('../models/User');
 dotenv.config();
 
-const getRoot = (req, res) => {}
+const getUsers = async (req, res) => {
+  try {
+    const submissions = await userDB.find();
+    res.status(200).json(submissions);
+  } catch (error) {
+    res.status(400).json({error : error.message})
+  } 
+}
 
 const createUser = async (req, res) => {
     const {username, height, email} = req.body;
@@ -17,7 +24,7 @@ const createUser = async (req, res) => {
         pass:process.env.EMAIL_PWD, 
       }
     });
-    if (!email) return res.status(400).json({'message': 'Email required'})
+    if (!email) return res.status(400).JSON({'message': 'Email required'})
     try {
       
         const newUser = userDB.create({
@@ -60,4 +67,4 @@ const createUser = async (req, res) => {
 }
 
 
-module.exports = { getRoot, createUser };
+module.exports = { getUsers, createUser };
