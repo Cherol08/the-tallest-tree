@@ -5,7 +5,7 @@ dotenv.config();
 
 const getUsers = async (req, res) => {
   try {
-    const submissions = await userDB.find({},{username:1, height: 1, _id:0});
+    const submissions = await userDB.find();
     res.status(200).json(submissions);
   } catch (error) {
     res.status(400).json({error : error.message})

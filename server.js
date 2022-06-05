@@ -19,7 +19,7 @@ app.use(cors());
 const DATABASE_URI = process.env.DATABASE_URI;
 
 // use middleware to connect to application
-app.use('/', userRoutes);
+app.use('/users', userRoutes);
 
 
 mongoose.connect(DATABASE_URI, { useNewUrlParser: true, useUnifiedTopology: true})
